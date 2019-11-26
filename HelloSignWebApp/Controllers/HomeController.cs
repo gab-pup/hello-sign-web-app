@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using HelloSignWebApp.Models;
 using HelloSign;
 using System.Linq;
-using System;
 
 namespace HelloSignWebApp.Controllers
 {
@@ -23,6 +22,19 @@ namespace HelloSignWebApp.Controllers
 
         public IActionResult Index()
         {
+            var fileName = "file-example_PDF_1MB.pdf";
+
+            //delete previously downloaded file
+            System.IO.File.Delete($"C:\\Users\\miguelp\\source\\repos\\HelloSignWebApp\\HelloSignWebApp\\{fileName}");
+
+            //download document to sign
+            var webClient = new System.Net.WebClient();
+            var remoteUri = "https://file-examples.com/wp-content/uploads/2017/10/";
+
+            //saves by default to application startup path
+            webClient.DownloadFile(remoteUri + fileName, fileName);
+
+            //create signature request 
             var client = new Client(API_KEY);
 
             var request = new SignatureRequest
@@ -31,9 +43,8 @@ namespace HelloSignWebApp.Controllers
                 Message = "Awesome, right?",
                 TestMode = true
             };
-            request.AddSigner("miguelp@pageuppeople.com", "Gab McSign");
-            request.AddCc("lawyer@example.com");
-            request.AddFile("C:\\Users\\miguelp\\Documents\\TestDocument.pdf");
+            request.AddSigner("lorenzos@pageuppeople.com", "Renzo McSign");
+            request.AddFile($"C:\\Users\\miguelp\\source\\repos\\HelloSignWebApp\\HelloSignWebApp\\{fileName}");
 
             var response = client.CreateEmbeddedSignatureRequest(request, CLIENT_ID);
 
